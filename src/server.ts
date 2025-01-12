@@ -1,6 +1,20 @@
-import express from 'express'
-import colors from 'colors'
-import morgan from 'morgan'
+import express from 'express';
+import colors from 'colors';
+import morgan from 'morgan';
+import { db } from './config/db';
+
+const connectDB = async () => {
+      try {
+            await db.authenticate();
+            db.sync();
+            console.log(colors.blue.bold('Conexíon exitosa a la BD'));
+      } catch (error) {
+            console.log(colors.red.bold('Fallo la Conexión a la BD'));
+
+      }
+};
+
+connectDB();
 
 const app = express()
 
