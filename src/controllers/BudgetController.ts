@@ -38,45 +38,16 @@ export class BudgetController {
       };
 
       static updateById = async (req: Request, res: Response) => {
-            try {
-                  const { id } = req.params;
-                  const budget = await BudgetModel.findByPk(id);
-
-                  if (!budget) {
-                        const error = new Error('Presupuesto no encontrado');
-                        res.status(404).json({ error: error.message });
-                  };
-                  //write body changes
-                  await budget.update(req.body);
-                  res.json('Presupuesto Actualizado Correctamente');
-                  return;
-
-            } catch (error) {
-                  console.log(error);
-                  res.status(500).json({ error: 'Hubo un Error' });
-                  return;
-            }
+            //write body changes
+            await req.budget.update(req.body);
+            res.json('Presupuesto Actualizado Correctamente');
+            return;
       };
 
       static deleteById = async (req: Request, res: Response) => {
-            try {
-                  const { id } = req.params;
-                  const budget = await BudgetModel.findByPk(id);
-
-                  if (!budget) {
-                        const error = new Error('Presupuesto no encontrado');
-                        res.status(404).json({ error: error.message });
-                        return;
-                  };
-                  await budget.destroy();
-                  res.json('Presupuesto eliminado correctamente');
-                  return;
-
-            } catch (error) {
-                  // console.log(error);
-                  res.status(500).json({ error: 'Hubo un Error' });
-                  return;
-            };
+            await req.budget.destroy();
+            res.json('Presupuesto eliminado correctamente');
+            return;
       };
 
 }
