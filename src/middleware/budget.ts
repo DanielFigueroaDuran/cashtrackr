@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { param, validationResult } from 'express-validator';
+import { body, param, validationResult } from 'express-validator';
 import BudgetModel from '../models/BudgetModel';
-import express from 'express';
 
 declare global {
       namespace Express {
@@ -49,4 +48,15 @@ export const validateBudgetExist = async (req: Request, res: Response, next: Nex
       };
 
 
+};
+
+export const validateBudgetInput = async (req: Request, res: Response, next: NextFunction) => {
+      await body('name')
+            .notEmpty().withMessage('El nombre del presupuesto no puede ir vacio').run(req);
+      await body('amount')
+            .notEmpty().withMessage('La cantidad del presupuesto no puede ir vacia')
+            .isNumeric().withMessage('Cantidad no valida')
+            .custom(value => value > 0).withMessage('EL presupuesto debe ser mayor de 0').run(req);
+
+      next();
 };
