@@ -33,8 +33,6 @@ router.delete('/:budgetId', BudgetController.deleteById);
 
 /** Routes for expenses */
 
-router.get('/:budgetId/expenses', ExpensesController.getAll);
-
 router.post('/:budgetId/expenses',
       validateExpenseInput,
       handleInputErrors,
