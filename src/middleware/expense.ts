@@ -1,5 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, param, validationResult } from 'express-validator';
+import ExpenseModel from '../models/ExpenseModel';
+
+declare global {
+      namespace Express {
+            interface Request {
+                  expense?: ExpenseModel
+            }
+      }
+};
 
 export const validateExpenseInput = async (req: Request, res: Response, next: NextFunction) => {
       await body('name')
@@ -26,4 +35,27 @@ export const validateExpenseId = async (req: Request, res: Response, next: NextF
       };
 
       next();
+};
+
+export const validateExpenseExist = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+            const { expenseId } = req.params;
+            const expense = await ExpenseModel.findByPk(expenseId);
+
+            if (!expense) {
+                  const error = new Error('Gasto no encontrado');
+                  res.status(404).json({ error: error.message });
+                  return;
+            };
+
+            req.expense = expense;
+
+            next();
+
+      } catch (error) {
+            // console.log(error);
+            res.status(500).json({ error: 'Hubo un Error' });
+            return;
+      };
+
 };
