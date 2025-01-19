@@ -3,6 +3,7 @@ import UserModel from '../models/UserModel';
 import { checkPassword, hashPassword } from '../utils/auth';
 import { generateToken } from '../utils/token';
 import { AuthEmail } from '../email/AuthEmail';
+import { generateJWT } from '../utils/jwt';
 
 export class AuthController {
       static createAccount = async (req: Request, res: Response) => {
@@ -69,11 +70,15 @@ export class AuthController {
                   return
             };
 
+            //check if I confirm your account
+
             if (!user.confirmed) {
                   const error = new Error('La cuenta no ha sido confirmada');
                   res.status(403).json({ error: error.message });
                   return
             };
+
+            //check if the password is correct
 
             const isPasswordCorrect = await checkPassword(password, user.password);
 
@@ -83,6 +88,10 @@ export class AuthController {
                   return
             };
 
-            res.json(isPasswordCorrect);
+            //generate jwt
+
+            const token = generateJWT(user.id);
+
+            res.json(token);
       };
 };
