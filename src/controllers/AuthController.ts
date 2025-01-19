@@ -56,6 +56,18 @@ export class AuthController {
       };
 
       static login = async (req: Request, res: Response) => {
-            res.json(req.body)
+            // res.json(req.body)
+            const { email } = req.body;
+
+            const user = await UserModel.findOne({ where: { email } })
+
+            //check that the user exists
+
+            if (!user) {
+                  const error = new Error('Usuario no Encontrado');
+                  res.status(409).json({ error: error.message });
+                  return
+            };
+            res.json(user);
       };
 };
