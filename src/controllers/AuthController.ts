@@ -39,6 +39,19 @@ export class AuthController {
       };
 
       static confirmAccount = async (req: Request, res: Response) => {
-            console.log('desde Confirmando cuenta token');
+            // console.log(req.body.token);
+            const { token } = req.body;
+
+            const user = await UserModel.findOne({ where: { token } });
+            if (!user) {
+                  const error = new Error('Token no válido');
+                  res.status(401).json({ error: error.message });
+                  return;
+            };
+            user.confirmed = true;
+            user.token = null;
+            await user.save();
+
+            res.json('Cuenta confirmada correctamente');
       };
 };
