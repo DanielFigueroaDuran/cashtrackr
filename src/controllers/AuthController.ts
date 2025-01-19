@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import UserModel from '../models/UserModel';
-import { hashPassword } from '../utils/auth';
+import { checkPassword, hashPassword } from '../utils/auth';
 import { generateToken } from '../utils/token';
 import { AuthEmail } from '../email/AuthEmail';
 
@@ -57,7 +57,7 @@ export class AuthController {
 
       static login = async (req: Request, res: Response) => {
             // res.json(req.body)
-            const { email } = req.body;
+            const { email, password } = req.body;
 
             const user = await UserModel.findOne({ where: { email } })
 
@@ -75,6 +75,14 @@ export class AuthController {
                   return
             };
 
-            res.json(user);
+            const isPasswordCorrect = await checkPassword(password, user.password);
+
+            if (!isPasswordCorrect) {
+                  const error = new Error('password Incorrecto');
+                  res.status(401).json({ error: error.message });
+                  return
+            };
+
+            res.json(isPasswordCorrect);
       };
 };
