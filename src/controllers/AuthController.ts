@@ -36,5 +36,9 @@ export class AuthController {
                   res.status(500).json({ error: 'Hubo un Error' });
             }
 
-      }
+      };
+
+      static confirmAccount = async (req: Request, res: Response) => {
+            console.log('desde Confirmando cuenta token');
+      };
 };

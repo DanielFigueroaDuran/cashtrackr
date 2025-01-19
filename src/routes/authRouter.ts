@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/AuthController";
 import { body } from "express-validator";
-import { handleInputErrors } from "../middleware/validation";
+import { handleInputErrors } from '../middleware/validation';
 
 const router = Router();
 
@@ -14,6 +14,15 @@ router.post('/create-account',
             .isEmail().withMessage('E-mail no válido'),
       handleInputErrors,
       AuthController.createAccount
+);
+
+router.post('/confirm-account',
+      body('token')
+            .notEmpty()
+            .isLength({ min: 6, max: 6 })
+            .withMessage('Token no válido'),
+      handleInputErrors,
+      AuthController.confirmAccount
 );
 
 export default router
