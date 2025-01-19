@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import UserModel from '../models/UserModel';
 import { hashPassword } from '../utils/auth';
+import { generateToken } from '../utils/token';
 
 export class AuthController {
       static createAccount = async (req: Request, res: Response) => {
@@ -18,6 +19,7 @@ export class AuthController {
             try {
                   const user = new UserModel(req.body);
                   user.password = await hashPassword(password);
+                  user.token = generateToken();
                   await user.save();
                   res.json('Cuenta Creada Correctamente');
 
