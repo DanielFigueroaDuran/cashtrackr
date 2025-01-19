@@ -6,6 +6,8 @@ import { limiter } from "../config/limiter";
 
 const router = Router();
 
+router.use(limiter);
+
 router.post('/create-account',
       body('name')
             .notEmpty().withMessage('El nombre no puede ir vacio'),
