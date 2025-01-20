@@ -94,4 +94,28 @@ export class AuthController {
 
             res.json(token);
       };
+
+      static forgotPassword = async (req: Request, res: Response) => {
+            const { email } = req.body;
+
+            const user = await UserModel.findOne({ where: { email } });
+
+            //check that the user exists
+
+            if (!user) {
+                  const error = new Error('usuario no encontrado');
+                  res.status(404).json({ error: error.message });
+                  return
+            };
+            user.token = generateToken();
+            await user.save();
+
+            await AuthEmail.sendPasswordResetToken({
+                  name: user.name,
+                  email: user.email,
+                  token: user.token
+            });
+
+            res.json('Revisa tu email para instruciones');
+      };
 };
