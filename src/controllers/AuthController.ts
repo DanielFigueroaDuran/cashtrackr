@@ -152,4 +152,8 @@ export class AuthController {
 
             res.json('El password se modifió correctamente');
       };
+
+      static user = async (req: Request, res: Response) => {
+            res.json(req.headers.authorization);
+      };
 };
