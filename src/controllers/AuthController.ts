@@ -118,4 +118,17 @@ export class AuthController {
 
             res.json('Revisa tu email para instruciones');
       };
+
+      static validateToken = async (req: Request, res: Response) => {
+            const { token } = req.body;
+
+            const tokenExits = await UserModel.findOne({ where: { token } });
+            if (!tokenExits) {
+                  const error = new Error('Token no valido');
+                  res.status(404).json({ error: error.message });
+                  return;
+            };
+
+            res.json('Token válido...');
+      };
 };
