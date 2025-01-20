@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/AuthController";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { handleInputErrors } from '../middleware/validation';
 import { limiter } from "../config/limiter";
 
@@ -55,6 +55,17 @@ router.post('/validate-token',
             .withMessage('Token no válido'),
       handleInputErrors,
       AuthController.validateToken
+);
+
+router.post('/reset-password/:token',
+      param('token')
+            .notEmpty()
+            .isLength({ min: 6, max: 6 })
+            .withMessage('Token no válido'),
+      body('password')
+            .isLength({ min: 8 }).withMessage('El password es muy corto, mínimo 8 caracteres'),
+      handleInputErrors,
+      AuthController.resetPasswordWithToken
 );
 
 

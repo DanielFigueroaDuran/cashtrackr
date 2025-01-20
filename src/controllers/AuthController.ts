@@ -5,6 +5,7 @@ import { generateToken } from '../utils/token';
 import { AuthEmail } from '../email/AuthEmail';
 import { generateJWT } from '../utils/jwt';
 
+
 export class AuthController {
       static createAccount = async (req: Request, res: Response) => {
             const { email, password } = req.body;
@@ -130,5 +131,25 @@ export class AuthController {
             };
 
             res.json('Token válido...');
+      };
+
+      static resetPasswordWithToken = async (req: Request, res: Response) => {
+            const { token } = req.params;
+            const { password } = req.body;
+
+            const user = await UserModel.findOne({ where: { token } });
+            if (!user) {
+                  const error = new Error('Token no valido');
+                  res.status(404).json({ error: error.message });
+                  return;
+            };
+
+            // assign a new password
+
+            user.password = await hashPassword(password);
+            user.token = null;
+            await user.save();
+
+            res.json('El password se modifió correctamente');
       };
 };
