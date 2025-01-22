@@ -178,7 +178,14 @@ export class AuthController {
 
             try {
                   const decored = Jwt.verify(token, process.env.JWT_SECRET);
-                  res.json(decored);
+                  // res.json(decored);
+                  if (typeof decored === 'object' && decored.id) {
+                        const user = await UserModel.findByPk(decored.id, {
+                              attributes: ['id', 'name', 'email']
+                        });
+
+                        res.json(user);
+                  };
 
             } catch (error) {
                   // console.log(error);
