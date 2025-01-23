@@ -172,7 +172,10 @@ export class AuthController {
                   return;
             };
 
-            res.json(user);
+            user.password = await hashPassword(password);
+            await user.save();
+
+            res.json('El password se modificó correctamente');
 
       };
 };
