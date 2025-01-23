@@ -157,4 +157,8 @@ export class AuthController {
             // res.json(req.headers.authorization);
             res.json(req.user);
       };
+
+      static updateCurrentUserPassword = async (req: Request, res: Response) => {
+            res.json('updateCurrentUserPassword');
+      };
 }
