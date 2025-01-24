@@ -5,10 +5,13 @@ import { handleInputErrors } from '../middleware/validation';
 import { validateBudgetExist, validateBudgetId, validateBudgetInput } from '../middleware/budget';
 import { ExpensesController } from "../controllers/ExpenseController";
 import { validateExpenseExist, validateExpenseId, validateExpenseInput } from "../middleware/expense";
+import { authenticate } from "../middleware/auth";
 
 const router = Router();
 
 //Every time we pass a parameter this code will be executed first
+
+router.use(authenticate); //We protect all the methods that this router has
 
 router.param('budgetId', validateBudgetId);
 router.param('budgetId', validateBudgetExist);
