@@ -8,6 +8,16 @@ jest.mock('../../models/BudgetModel', () => ({
 }));
 
 describe('BudgetController.getAll', () => {
+
+      beforeEach(() => {
+            //console.log('Arrancando nuevo test...');
+            (BudgetModel.findAll as jest.Mock).mockReset();
+            (BudgetModel.findAll as jest.Mock).mockImplementation((options) => {
+                  const updateBudgets = budgets.filter(budget => budget.userId === options.where.userId);
+                  return Promise.resolve(updateBudgets);
+            });
+      });
+
       it('should retrieve 2 budget for user with ID 1', async () => {
             const req = createRequest({
                   method: 'GET',
@@ -15,15 +25,10 @@ describe('BudgetController.getAll', () => {
                   user: { id: 1 }
             });
             const res = createResponse();
-
-            const updateBudgets = budgets.filter(budget => budget.userId === req.user.id);
-
-            (BudgetModel.findAll as jest.Mock).mockResolvedValue(updateBudgets);
             await BudgetController.getAll(req, res);
 
             const data = res._getJSONData();
             // console.log(data);
-
             expect(data).toHaveLength(2);
             expect(res.statusCode).toBe(200);
             expect(res.status).not.toBe(404);
@@ -37,14 +42,10 @@ describe('BudgetController.getAll', () => {
             });
             const res = createResponse();
 
-            const updateBudgets = budgets.filter(budget => budget.userId === req.user.id);
-
-            (BudgetModel.findAll as jest.Mock).mockResolvedValue(updateBudgets);
             await BudgetController.getAll(req, res);
 
             const data = res._getJSONData();
             // console.log(data);
-
             expect(data).toHaveLength(1);
             expect(res.statusCode).toBe(200);
             expect(res.status).not.toBe(404);
@@ -54,18 +55,13 @@ describe('BudgetController.getAll', () => {
             const req = createRequest({
                   method: 'GET',
                   url: 'api/budget',
-                  user: { id: 10 }
+                  user: { id: 100 }
             });
             const res = createResponse();
-
-            const updateBudgets = budgets.filter(budget => budget.userId === req.user.id);
-
-            (BudgetModel.findAll as jest.Mock).mockResolvedValue(updateBudgets);
             await BudgetController.getAll(req, res);
 
             const data = res._getJSONData();
             // console.log(data);
-
             expect(data).toHaveLength(0);
             expect(res.statusCode).toBe(200);
             expect(res.status).not.toBe(404);
