@@ -11,7 +11,7 @@ describe('BudgetController.getAll', () => {
 
       beforeEach(() => {
             //console.log('Arrancando nuevo test...');
-            (BudgetModel.findAll as jest.Mock).mockReset();
+            (BudgetModel.findAll as jest.Mock).mockReset(); //restart the mock every time it finishes
             (BudgetModel.findAll as jest.Mock).mockImplementation((options) => {
                   const updateBudgets = budgets.filter(budget => budget.userId === options.where.userId);
                   return Promise.resolve(updateBudgets);
@@ -65,5 +65,20 @@ describe('BudgetController.getAll', () => {
             expect(data).toHaveLength(0);
             expect(res.statusCode).toBe(200);
             expect(res.status).not.toBe(404);
+      });
+
+      it('should handle errors when fetching budget ', async () => {
+            const req = createRequest({
+                  method: 'GET',
+                  url: 'api/budget',
+                  user: { id: 100 }
+            });
+            const res = createResponse();
+
+            (BudgetModel.findAll as jest.Mock).mockRejectedValue(new Error)
+            await BudgetController.getAll(req, res)
+
+            expect(res.statusCode).toBe(500)
+            expect(res._getJSONData()).toEqual({ error: 'Hubo un Error' })
       });
 });
