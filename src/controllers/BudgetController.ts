@@ -4,6 +4,7 @@ import ExpenseModel from "../models/ExpenseModel";
 
 export class BudgetController {
       static getAll = async (req: Request, res: Response) => {
+
             try {
                   const budgets = await BudgetModel.findAll({
                         order: [
@@ -17,7 +18,7 @@ export class BudgetController {
                   res.json(budgets);
 
             } catch (error) {
-                  //console.log(error);
+                  // console.log(error);
                   res.status(500).json({ error: 'Hubo un Error' });
             };
       };
