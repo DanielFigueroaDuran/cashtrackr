@@ -8,11 +8,14 @@ export class BudgetController {
                   const budgets = await BudgetModel.findAll({
                         order: [
                               ['createdAt', 'DESC']
-                        ]
+                        ],
+                        where: {
+                              userId: req.user.id
+                        }
                   });
 
                   res.json(budgets);
-                  //TODO: filter by authenticated user
+
             } catch (error) {
                   //console.log(error);
                   res.status(500).json({ error: 'Hubo un Error' });
