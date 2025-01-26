@@ -40,6 +40,7 @@ export class BudgetController {
             const budget = await BudgetModel.findByPk(req.budget.id, {
                   include: [ExpenseModel]
             });
+
             res.json(budget);
       };
 

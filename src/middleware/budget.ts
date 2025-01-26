@@ -60,3 +60,17 @@ export const validateBudgetInput = async (req: Request, res: Response, next: Nex
 
       next();
 };
+
+export const hasAccess = (req: Request, res: Response, next: NextFunction) => {
+      // res.json({
+      //       budget: req.budget,
+      //       user: req.user
+      // });
+
+      if (req.budget.userId !== req.user.id) {
+            const error = new Error('Acción no válida');
+            res.status(401).json({ error: error.message });
+      };
+
+      next();
+};
