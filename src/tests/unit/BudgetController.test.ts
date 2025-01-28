@@ -1,11 +1,13 @@
 import { createRequest, createResponse } from "node-mocks-http";
-import { budgets } from "../mocks/budgets";
+import { budgets } from '../mocks/budgets';
 import { BudgetController } from "../../controllers/BudgetController";
 import BudgetModel from "../../models/BudgetModel";
+import ExpenseModel from "../../models/ExpenseModel";
 
 jest.mock('../../models/BudgetModel', () => ({
       findAll: jest.fn(),
-      create: jest.fn()
+      create: jest.fn(),
+      findByPk: jest.fn()
 }));
 
 describe('BudgetController.getAll', () => {
@@ -134,5 +136,66 @@ describe('BudgetController.create', () => {
 
             expect(mockBudget.save).not.toHaveBeenCalled();
             expect(BudgetModel.create).toHaveBeenCalledWith(req.body);
+      });
+
+      describe('BudgetController.getById', () => {
+
+            beforeEach(() => {
+                  (BudgetModel.findByPk as jest.Mock).mockImplementation((id) => {
+                        //console.log(id);
+                        const budget = budgets.filter(b => b.id === id)[0]
+                        return Promise.resolve(budget);
+                  });
+            });
+
+            it('should return a budget wit ID 1 and 3 expenses', async () => {
+                  const req = createRequest({
+                        method: 'GET',
+                        url: 'api/budget/:id',
+                        budget: { id: 1 }
+
+                  });
+                  const res = createResponse();
+                  await BudgetController.getById(req, res);
+
+                  const data = res._getJSONData();
+                  expect(res.statusCode).toBe(200);
+                  expect(data.expenses).toHaveLength(3);
+                  expect(BudgetModel.findByPk).toHaveBeenCalled();
+                  expect(BudgetModel.findByPk).toHaveBeenCalledTimes(1);
+                  expect(BudgetModel.findByPk).toHaveBeenCalledWith(req.budget.id, {
+                        include: [ExpenseModel]
+                  });
+            });
+
+            it('should return a budget wit ID 2 and 2 expenses', async () => {
+                  const req = createRequest({
+                        method: 'GET',
+                        url: 'api/budget/:id',
+                        budget: { id: 2 }
+
+                  });
+                  const res = createResponse();
+                  await BudgetController.getById(req, res);
+
+                  const data = res._getJSONData();
+                  expect(res.statusCode).toBe(200);
+                  expect(data.expenses).toHaveLength(2);
+            });
+
+            it('should return a budget wit ID 3 and 0 expenses', async () => {
+                  const req = createRequest({
+                        method: 'GET',
+                        url: 'api/budget/:id',
+                        budget: { id: 3 }
+
+                  });
+                  const res = createResponse();
+                  await BudgetController.getById(req, res);
+
+                  const data = res._getJSONData();
+                  expect(res.statusCode).toBe(200);
+                  expect(data.expenses).toHaveLength(0);
+            });
       });
 });
