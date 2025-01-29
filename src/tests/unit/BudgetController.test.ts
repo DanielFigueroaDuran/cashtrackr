@@ -151,7 +151,7 @@ describe('BudgetController.create', () => {
             it('should return a budget wit ID 1 and 3 expenses', async () => {
                   const req = createRequest({
                         method: 'GET',
-                        url: 'api/budget/:id',
+                        url: 'api/budget/budgetId',
                         budget: { id: 1 }
 
                   });
@@ -171,7 +171,7 @@ describe('BudgetController.create', () => {
             it('should return a budget wit ID 2 and 2 expenses', async () => {
                   const req = createRequest({
                         method: 'GET',
-                        url: 'api/budget/:id',
+                        url: 'api/budget/:budgetId',
                         budget: { id: 2 }
 
                   });
@@ -186,7 +186,7 @@ describe('BudgetController.create', () => {
             it('should return a budget wit ID 3 and 0 expenses', async () => {
                   const req = createRequest({
                         method: 'GET',
-                        url: 'api/budget/:id',
+                        url: 'api/budget/:budgetId',
                         budget: { id: 3 }
 
                   });
@@ -196,6 +196,31 @@ describe('BudgetController.create', () => {
                   const data = res._getJSONData();
                   expect(res.statusCode).toBe(200);
                   expect(data.expenses).toHaveLength(0);
+            });
+      });
+
+      describe('BudgetController.updateById', () => {
+            it('shoud update the budget and return a success message', async () => {
+                  const budgetMock = {
+                        update: jest.fn().mockResolvedValue(true)
+                  };
+
+                  const req = createRequest({
+                        method: 'PUT',
+                        url: 'api/budget/:budgetId',
+                        budget: budgetMock,
+                        body: { name: 'Presupuesto Actualizado', amount: 5000 }
+                  });
+                  const res = createResponse();
+                  await BudgetController.updateById(req, res);
+
+                  const data = res._getJSONData();
+                  expect(res.statusCode).toBe(200);
+                  expect(data).toBe('Presupuesto Actualizado Correctamente');
+                  expect(budgetMock.update).toHaveBeenCalled();
+                  expect(budgetMock.update).toHaveBeenCalledTimes(1);
+                  expect(budgetMock.update).toHaveBeenCalledWith(req.body);
+
             });
       });
 });
