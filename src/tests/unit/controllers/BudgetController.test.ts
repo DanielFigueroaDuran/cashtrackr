@@ -1,10 +1,10 @@
 import { createRequest, createResponse } from "node-mocks-http";
-import { budgets } from '../mocks/budgets';
-import { BudgetController } from "../../controllers/BudgetController";
-import BudgetModel from "../../models/BudgetModel";
-import ExpenseModel from "../../models/ExpenseModel";
+import { budgets } from '../../mocks/budgets';
+import { BudgetController } from "../../../controllers/BudgetController";
+import BudgetModel from "../../../models/BudgetModel";
+import ExpenseModel from "../../../models/ExpenseModel";
 
-jest.mock('../../models/BudgetModel', () => ({
+jest.mock('../../../models/BudgetModel', () => ({
       findAll: jest.fn(),
       create: jest.fn(),
       findByPk: jest.fn()
