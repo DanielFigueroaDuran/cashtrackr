@@ -81,4 +81,18 @@ describe('Budget Middleware - hasAccess', () => {
             expect(next).toHaveBeenCalled();
             expect(next).toHaveBeenCalledTimes(1);
       });
+
+      it('should return 401 error if userId does not have access to budget', () => {
+            const req = createRequest({
+                  budget: budgets[0],
+                  user: { id: 1 }
+            });
+            const res = createResponse();
+            const next = jest.fn();
+
+
+            hasAccess(req, res, next);
+            expect(next).toHaveBeenCalled();
+            expect(next).toHaveBeenCalledTimes(1);
+      });
 });
