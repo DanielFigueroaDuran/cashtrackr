@@ -27,6 +27,25 @@ describe('budget - validateBudgetExists', () => {
             expect(next).not.toHaveBeenCalled();
       });
 
+      it('should handle not-existent budget', async () => {
+            (BudgetModel.findByPk as jest.Mock).mockRejectedValue(new Error);
+
+            const req = createRequest({
+                  params: {
+                        budgetId: 1
+                  }
+            });
+            const res = createResponse();
+            const next = jest.fn();
+
+            await validateBudgetExist(req, res, next);
+
+            const data = res._getJSONData();
+            expect(res.statusCode).toBe(500);
+            expect(data).toEqual({ error: 'Hubo un Error' });
+            expect(next).not.toHaveBeenCalled();
+      });
+
       it('should to next middleware if budget exists', async () => {
             (BudgetModel.findByPk as jest.Mock).mockResolvedValue(budgets[0]);
 
