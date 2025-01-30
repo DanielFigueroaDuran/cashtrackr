@@ -1,5 +1,5 @@
 import { createRequest, createResponse } from "node-mocks-http";
-import { validateBudgetExist } from '../../../middleware/budget';
+import { hasAccess, validateBudgetExist } from '../../../middleware/budget';
 import BudgetModel from "../../../models/BudgetModel";
 import { budgets } from '../../mocks/budgets';
 
@@ -7,7 +7,7 @@ jest.mock('../../../models/BudgetModel', () => ({
       findByPk: jest.fn()
 }));
 
-describe('budget - validateBudgetExists', () => {
+describe('Budget Middleware - validateBudgetExists', () => {
       it('should handle not-existent budget', async () => {
             (BudgetModel.findByPk as jest.Mock).mockResolvedValue(null);
 
@@ -53,12 +53,32 @@ describe('budget - validateBudgetExists', () => {
                   params: {
                         budgetId: 1
                   }
+
             });
+
             const res = createResponse();
             const next = jest.fn();
 
             await validateBudgetExist(req, res, next);
             expect(next).toHaveBeenCalled();
             expect(req.budget).toEqual(budgets[0]);
+      });
+});
+
+describe('Budget Middleware - hasAccess', () => {
+      it('should call next() if user has access to budget', () => {
+            const req = createRequest({
+                  budget: budgets[0],
+                  user: { id: 1 }
+            });
+            const res = createResponse();
+            const next = jest.fn();
+
+            // console.log('cls1', req.budget.id);
+            // console.log('clg2', req.budget.userId);
+
+            hasAccess(req, res, next);
+            expect(next).toHaveBeenCalled();
+            expect(next).toHaveBeenCalledTimes(1);
       });
 });
