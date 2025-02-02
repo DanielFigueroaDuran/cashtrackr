@@ -7,7 +7,8 @@ export class ExpensesController {
             // console.log(req.params.budgetId);
             // console.log(req.budget.id);
             try {
-                  const expense = new ExpenseModel(req.body);
+                  // const expense = new ExpenseModel(req.body);
+                  const expense = await ExpenseModel.create(req.body);
                   expense.budgetId = req.budget.id;
                   await expense.save();
                   res.status(201).json('Gasto agregado correctamente');

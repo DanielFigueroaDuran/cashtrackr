@@ -85,14 +85,18 @@ describe('Budget Middleware - hasAccess', () => {
       it('should return 401 error if userId does not have access to budget', () => {
             const req = createRequest({
                   budget: budgets[0],
-                  user: { id: 1 }
+                  user: { id: 2 }
             });
             const res = createResponse();
             const next = jest.fn();
 
 
             hasAccess(req, res, next);
-            expect(next).toHaveBeenCalled();
-            expect(next).toHaveBeenCalledTimes(1);
+            expect(next).not.toHaveBeenCalled();
+            expect(res.statusCode).toBe(401);
+            expect(res._getJSONData()).toEqual({ error: 'Acción no válida' });
       });
+
+
+
 });
