@@ -103,3 +103,28 @@ describe('ExpensesController.updateById', () => {
             expect(expenseMock.update).toHaveBeenCalledTimes(1);
       });
 });
+
+describe('ExpensesController.deleteById', () => {
+      it('should delete expense and return a success message', async () => {
+            const expenseMock = {
+                  ...expenses[0],
+                  destroy: jest.fn()
+            };
+
+            const req = createRequest({
+                  method: 'DELETE',
+                  url: '/api/budgets/:budgetId/expenses/:expenseId',
+                  expense: expenseMock
+            });
+
+            const res = createResponse();
+
+            await ExpensesController.deleteById(req, res);
+
+            const data = res._getJSONData();
+            expect(res.statusCode).toBe(200);
+            expect(data).toEqual('Gasto Eliminado');
+            expect(expenseMock.destroy).toHaveBeenCalled();
+            expect(expenseMock.destroy).toHaveBeenCalledTimes(1);
+      });
+});
