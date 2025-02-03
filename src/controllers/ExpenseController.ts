@@ -24,7 +24,7 @@ export class ExpensesController {
 
       static updateById = async (req: Request, res: Response) => {
             await req.expense.update(req.body);
-            res.status(201).json('Se Actualizó Correctamente');
+            res.json('Se Actualizó Correctamente');
       }
 
       static deleteById = async (req: Request, res: Response) => {

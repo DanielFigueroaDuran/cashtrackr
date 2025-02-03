@@ -74,6 +74,32 @@ describe('ExpensesController.getById', () => {
 
             const data = res._getJSONData();
             expect(res.statusCode).toBe(200);
-            expect(data).toEqual(expenses[0])
+            expect(data).toEqual(expenses[0]);
+      });
+});
+
+describe('ExpensesController.updateById', () => {
+      it('should return expense with ID', async () => {
+            const expenseMock = {
+                  ...expenses[0],
+                  update: jest.fn().mockResolvedValue(true)
+            };
+
+            const req = createRequest({
+                  method: 'PUT',
+                  url: '/api/budgets/:budgetId/expenses/:expenseId',
+                  expense: expenseMock,
+                  body: { name: 'Updated Expense', amount: 100 }
+            });
+            const res = createResponse();
+
+            await ExpensesController.updateById(req, res);
+
+            const data = res._getJSONData();
+            expect(res.statusCode).toBe(200);
+            expect(data).toEqual('Se Actualizó Correctamente');
+            expect(expenseMock.update).toHaveBeenCalled();
+            expect(expenseMock.update).toHaveBeenCalledWith(req.body);
+            expect(expenseMock.update).toHaveBeenCalledTimes(1);
       });
 });
