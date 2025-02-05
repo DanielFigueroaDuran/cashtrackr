@@ -43,4 +43,23 @@ describe('Expenses Middleware - validateExpenseExists', () => {
             expect(next).toHaveBeenCalledTimes(1);
             expect(req.expense).toEqual(expenses[0]);
       });
+
+      it('should handle internal server error', async () => {
+
+            (ExpenseModel.findByPk as jest.Mock).mockRejectedValue(new Error);
+
+            const req = createRequest({
+                  params: { expenseId: 1 }
+            });
+            const res = createResponse();
+            const next = jest.fn();
+
+            await validateExpenseExist(req, res, next);
+
+            const data = res._getJSONData();
+            expect(next).not.toHaveBeenCalled();
+            expect(res.statusCode).toBe(500);
+            expect(data).toEqual({ error: 'Hubo un Error' });
+            expect(data).toHaveBeenCalledTimes(1);
+      });
 });

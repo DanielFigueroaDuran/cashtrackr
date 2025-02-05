@@ -27,7 +27,7 @@ describe('Budget Middleware - validateBudgetExists', () => {
             expect(next).not.toHaveBeenCalled();
       });
 
-      it('should handle not-existent budget', async () => {
+      it('should handle internal server error', async () => {
             (BudgetModel.findByPk as jest.Mock).mockRejectedValue(new Error);
 
             const req = createRequest({
@@ -90,13 +90,9 @@ describe('Budget Middleware - hasAccess', () => {
             const res = createResponse();
             const next = jest.fn();
 
-
             hasAccess(req, res, next);
             expect(next).not.toHaveBeenCalled();
             expect(res.statusCode).toBe(401);
             expect(res._getJSONData()).toEqual({ error: 'Acción no válida' });
       });
-
-
-
 });
