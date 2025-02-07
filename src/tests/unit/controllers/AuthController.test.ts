@@ -1,7 +1,7 @@
 import { createRequest, createResponse } from "node-mocks-http";
 import { AuthController } from "../../../controllers/AuthController";
 import UserModel from "../../../models/UserModel";
-import { hashPassword } from '../../../utils/auth';
+import { checkPassword, hashPassword } from '../../../utils/auth';
 import { generateToken } from "../../../utils/token";
 import { AuthEmail } from "../../../email/AuthEmail";
 
@@ -124,5 +124,38 @@ describe('AuthController.login', () => {
             const data = res._getJSONData();
             expect(res.statusCode).toBe(403);
             expect(data).toEqual({ error: 'La cuenta no ha sido confirmada' });
+      });
+
+      it('should return 401 if the password is incorrect', async () => {
+
+            const userMock = {
+                  id: 1,
+                  email: "test@test.com",
+                  password: "password",
+                  confirmed: true
+            };
+
+            (UserModel.findOne as jest.Mock).mockResolvedValue(userMock);
+
+            const req = createRequest({
+                  method: 'POST',
+                  url: '/api/auth/login',
+                  body: {
+                        email: "test@test.com",
+                        password: "testpassword"
+                  }
+            });
+
+            const res = createResponse();
+
+            (checkPassword as jest.Mock).mockResolvedValue(false);
+
+            await AuthController.login(req, res);
+
+            const data = res._getJSONData();
+            expect(res.statusCode).toBe(401);
+            expect(data).toEqual({ error: 'password Incorrecto' });
+            expect(checkPassword).toHaveBeenCalledWith(req.body.password, userMock.password);
+            expect(checkPassword).toHaveBeenCalledTimes(1);
       });
 });
