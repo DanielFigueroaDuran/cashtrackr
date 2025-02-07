@@ -1,7 +1,7 @@
 import { createRequest, createResponse } from "node-mocks-http";
 import { AuthController } from "../../../controllers/AuthController";
 import UserModel from "../../../models/UserModel";
-import { hashPassword } from "../../../utils/auth";
+import { hashPassword } from '../../../utils/auth';
 import { generateToken } from "../../../utils/token";
 import { AuthEmail } from "../../../email/AuthEmail";
 
@@ -61,6 +61,43 @@ describe('AuthController.createAccount', () => {
 
             await AuthController.createAccount(req, res);
 
+            expect(UserModel.create).toHaveBeenCalledWith(req.body);
+            expect(UserModel.create).toHaveBeenCalledTimes(1);
+            expect(mockUser.save).toHaveBeenCalled();
+            expect(mockUser.password).toBe('hashedpassword');
+            expect(mockUser.token).toBe('123456');
+            expect(AuthEmail.sendConfirmationEmail).toHaveBeenCalledWith({
+                  name: req.body.name,
+                  email: req.body.email,
+                  token: '123456'
+            });
+            expect(AuthEmail.sendConfirmationEmail).toHaveBeenCalledTimes(1);
             expect(res.statusCode).toBe(201);
+      });
+});
+
+describe('AuthController.login', () => {
+      it('should return  404 if user is not found', async () => {
+
+            (UserModel.findOne as jest.Mock).mockResolvedValue(null);
+
+            const req = createRequest({
+                  method: 'POST',
+                  url: '/api/auth/login',
+                  body: {
+                        email: "test@test.com",
+                        password: "testpassword"
+                  }
+            });
+
+            const res = createResponse();
+
+            await AuthController.login(req, res);
+
+            const data = res._getJSONData();
+            expect(res.statusCode).toBe(404);
+            expect(data).toEqual({ error: 'Usuario no Encontrado' });
+            // expect(UserModel.findOne).toHaveBeenCalled();
+            // expect(UserModel.findOne).toHaveBeenCalledTimes(1);
       });
 });
