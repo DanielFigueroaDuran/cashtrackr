@@ -4,10 +4,12 @@ import UserModel from "../../../models/UserModel";
 import { checkPassword, hashPassword } from '../../../utils/auth';
 import { generateToken } from "../../../utils/token";
 import { AuthEmail } from "../../../email/AuthEmail";
+import { generateJWT } from "../../../utils/jwt";
 
 jest.mock('../../../models/UserModel');
 jest.mock('../../../utils/auth');
 jest.mock('../../../utils/token');
+jest.mock('../../../utils/jwt');
 
 describe('AuthController.createAccount', () => {
 
@@ -157,5 +159,40 @@ describe('AuthController.login', () => {
             expect(data).toEqual({ error: 'password Incorrecto' });
             expect(checkPassword).toHaveBeenCalledWith(req.body.password, userMock.password);
             expect(checkPassword).toHaveBeenCalledTimes(1);
+      });
+
+      it('should return a JWT if authentication is succeeful', async () => {
+
+            const userMock = {
+                  id: 1,
+                  email: "test@test.com",
+                  password: "hashed_password",
+                  confirmed: true
+            };
+
+            const req = createRequest({
+                  method: 'POST',
+                  url: '/api/auth/login',
+                  body: {
+                        email: "test@test.com",
+                        password: "password"
+                  }
+            });
+
+            const res = createResponse();
+
+            const fakejwt = 'fake_jwt';
+
+            (UserModel.findOne as jest.Mock).mockResolvedValue(userMock);
+            (checkPassword as jest.Mock).mockResolvedValue(true);
+            (generateJWT as jest.Mock).mockReturnValue(fakejwt);
+
+            await AuthController.login(req, res);
+
+            const data = res._getJSONData();
+            expect(res.statusCode).toBe(200);
+            expect(data).toEqual(fakejwt);
+            expect(generateJWT).toHaveBeenCalledTimes(1);
+            expect(generateJWT).toHaveBeenCalledWith(userMock.id);
       });
 });
