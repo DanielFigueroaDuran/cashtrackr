@@ -32,7 +32,7 @@ export class AuthController {
                         token: user.token
                   })
 
-                  res.json('Cuenta Creada Correctamente');
+                  res.status(201).json('Cuenta Creada Correctamente');
 
             } catch (error) {
                   // console.log(error);
