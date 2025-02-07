@@ -97,7 +97,32 @@ describe('AuthController.login', () => {
             const data = res._getJSONData();
             expect(res.statusCode).toBe(404);
             expect(data).toEqual({ error: 'Usuario no Encontrado' });
-            // expect(UserModel.findOne).toHaveBeenCalled();
-            // expect(UserModel.findOne).toHaveBeenCalledTimes(1);
+      });
+
+      it('should return 403 if the account has not been confirmed', async () => {
+
+            (UserModel.findOne as jest.Mock).mockResolvedValue({
+                  id: 1,
+                  email: "test@test.com",
+                  password: "password",
+                  confirmed: false
+            });
+
+            const req = createRequest({
+                  method: 'POST',
+                  url: '/api/auth/login',
+                  body: {
+                        email: "test@test.com",
+                        password: "testpassword"
+                  }
+            });
+
+            const res = createResponse();
+
+            await AuthController.login(req, res);
+
+            const data = res._getJSONData();
+            expect(res.statusCode).toBe(403);
+            expect(data).toEqual({ error: 'La cuenta no ha sido confirmada' });
       });
 });
