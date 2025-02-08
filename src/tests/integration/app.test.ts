@@ -1,26 +1,24 @@
 import request from "supertest";
 import server, { connectDB } from "../../server";
+import { AuthController } from "../../controllers/AuthController";
 
 describe('Authentication - Create Account', () => {
-      // beforeAll(async () => {
-      //       await connectDB();
-      // });
 
       it('should display validation errors when form is empty', async () => {
             const response = await request(server)
                   .post('/api/auth/create-account')
                   .send({});
-
             // console.log(response.body);
+
+            const createAccountMock = jest.spyOn(AuthController, 'createAccount');
 
             expect(response.status).toBe(400);
             expect(response.body).toHaveProperty('errors');
             expect(response.body.errors).toHaveLength(3);
+
+            expect(response.status).not.toBe(201);
+            expect(response.body.errors).not.toHaveLength(2);
+            expect(createAccountMock).not.toHaveBeenCalled();
       });
 });
 
-// {
-//       "name": "Elias",
-//       "password": "12345678",
-//       "email": "figueroadurandanielelias@gmail.com"
-//     }
