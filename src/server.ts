@@ -27,9 +27,11 @@ app.use(express.json());
 app.use('/api/budgets', budgetRouter);
 app.use('/api/auth', authRouter);
 
-app.get('/', (req, res) => {
-      res.send('Todo bien...');
-});
+// app.get('/', (req, res) => {
+//       res.send('Todo bien...');
+// });
+
+console.log(process.env.NODE_ENV);
 
 
 export default app
