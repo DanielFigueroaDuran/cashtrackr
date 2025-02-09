@@ -161,4 +161,40 @@ describe('Authentication - Login', () => {
             expect(response.body.errors).not.toHaveLength(1);
             expect(loginMock).not.toHaveBeenCalled();
       });
+
+      it('should return 400 bad request when the email is invalid', async () => {
+            const response = await request(server)
+                  .post('/api/auth/login')
+                  .send({
+                        password: "12345678",
+                        email: "no_valid"
+                  });
+
+            const loginMock = jest.spyOn(AuthController, 'login');
+
+            expect(response.status).toBe(400);
+            expect(response.body).toHaveProperty('errors');
+            expect(response.body.errors).toHaveLength(1);
+            expect(response.body.errors[0].msg).toBe('Email no válido');
+
+            expect(response.body.errors).not.toHaveLength(2);
+            expect(loginMock).not.toHaveBeenCalled();
+      });
+
+      it('should return a 400 error if the user is not found', async () => {
+            const response = await request(server)
+                  .post('/api/auth/login')
+                  .send({
+                        password: "12345678",
+                        email: "user@test.com"
+                  });
+
+
+            expect(response.status).toBe(404);
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error.msg).toBe('Usuario no Encontrado');
+
+            expect(response.status).not.toBe(200);
+
+      });
 });
