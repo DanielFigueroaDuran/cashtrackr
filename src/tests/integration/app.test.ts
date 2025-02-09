@@ -117,5 +117,17 @@ describe('Authentication - Account Confirmation with Token or not vadid', () => 
             expect(response.body.errors).toHaveLength(1);
             expect(response.body.errors[0].msg).toBe('Token no válido')
       });
+
+      it('should display  when the Token is invalid', async () => {
+            const response = await request(server)
+                  .post('/api/auth/confirm-account').send({
+                        token: "123456"
+                  });
+
+            expect(response.status).toBe(401);
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toBe('Token no válido');
+            expect(response.status).not.toBe(200);
+      });
 });
 
