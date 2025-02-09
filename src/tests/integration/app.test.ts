@@ -41,24 +41,24 @@ describe('Authentication - Create Account', () => {
             expect(createAccountMock).not.toHaveBeenCalled();
       });
 
-      // it('should return 400 when tje password is invalid', async () => {
-      //       const response = await request(server)
-      //             .post('/api/auth/create-account')
-      //             .send({
-      //                   "name": "Daniel",
-      //                   "password": "",
-      //                   "email": "test@test.com"
-      //             });
+      it('should return 400 when tje password is invalid', async () => {
+            const response = await request(server)
+                  .post('/api/auth/create-account')
+                  .send({
+                        "name": "Daniel",
+                        "password": "",
+                        "email": "test@test.com"
+                  });
 
-      //       const createAccountMock = jest.spyOn(AuthController, 'createAccount');
+            const createAccountMock = jest.spyOn(AuthController, 'createAccount');
 
-      //       expect(response.status).toBe(400);
-      //       expect(response.body).toHaveProperty('errors');
-      //       expect(response.body.errors).toHaveLength(1);
+            expect(response.status).toBe(400);
+            expect(response.body).toHaveProperty('errors');
+            expect(response.body.errors).toHaveLength(1);
 
-      //       expect(response.status).not.toBe(201);
-      //       expect(response.body.errors).not.toHaveLength(2);
-      //       expect(createAccountMock).not.toHaveBeenCalled();
-      // });
+            expect(response.status).not.toBe(201);
+            expect(response.body.errors).not.toHaveLength(2);
+            expect(createAccountMock).not.toHaveBeenCalled();
+      });
 });
 
