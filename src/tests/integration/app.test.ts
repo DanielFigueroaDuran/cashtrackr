@@ -3,6 +3,7 @@ import server, { connectDB } from "../../server";
 import { AuthController } from "../../controllers/AuthController";
 import { response } from "express";
 import { body } from 'express-validator';
+import Response from 'express';
 
 describe('Authentication - Create Account', () => {
 
@@ -146,3 +147,18 @@ describe('Authentication - Account Confirmation with Token or not vadid', () => 
 
 });
 
+describe('Authentication - Login', () => {
+      it('should display validation errors when the form is empty', async () => {
+            const response = await request(server)
+                  .post('/api/auth/login')
+                  .send({});
+            const loginMock = jest.spyOn(AuthController, 'login');
+
+            expect(response.status).toBe(400);
+            expect(response.body).toHaveProperty('errors');
+            expect(response.body.errors).toHaveLength(2);
+
+            expect(response.body.errors).not.toHaveLength(1);
+            expect(loginMock).not.toHaveBeenCalled();
+      });
+});
