@@ -65,7 +65,7 @@ describe('Authentication - Create Account', () => {
             expect(createAccountMock).not.toHaveBeenCalled();
       });
 
-      it('should return 201 status code ', async () => {
+      it('should register a new user successfully ', async () => {
 
             const userData = {
                   "name": "Daniel",
@@ -79,6 +79,28 @@ describe('Authentication - Create Account', () => {
 
             expect(response.status).toBe(201);
             expect(response.status).not.toBe(400);
+            expect(response.body).not.toHaveProperty('errors');
+      });
+
+      it('should return 409 conflict when a user is already registered ', async () => {
+
+            const userData = {
+                  "name": "Daniel",
+                  "password": "12345678",
+                  "email": "test@test.com"
+            };
+
+            const response = await request(server)
+                  .post('/api/auth/create-account')
+                  .send(userData);
+
+            //console.log(response.body);
+
+            expect(response.status).toBe(409);
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toBe('Un usuario con ese email ya esta registrado');
+            expect(response.status).not.toBe(400);
+            expect(response.status).not.toBe(201);
             expect(response.body).not.toHaveProperty('errors');
       });
 });
