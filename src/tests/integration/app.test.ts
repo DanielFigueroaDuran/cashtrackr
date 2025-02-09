@@ -1,6 +1,8 @@
 import request from "supertest";
 import server, { connectDB } from "../../server";
 import { AuthController } from "../../controllers/AuthController";
+import { response } from "express";
+import { body } from 'express-validator';
 
 describe('Authentication - Create Account', () => {
 
@@ -118,7 +120,7 @@ describe('Authentication - Account Confirmation with Token or not vadid', () => 
             expect(response.body.errors[0].msg).toBe('Token no válido')
       });
 
-      it('should display  when the Token is invalid', async () => {
+      it('should display  error if token doesnt exists', async () => {
             const response = await request(server)
                   .post('/api/auth/confirm-account').send({
                         token: "123456"
@@ -129,5 +131,18 @@ describe('Authentication - Account Confirmation with Token or not vadid', () => 
             expect(response.body.error).toBe('Token no válido');
             expect(response.status).not.toBe(200);
       });
+
+      it('should display account with a valid token', async () => {
+            const token = globalThis.cashtrackrComfirmationToken;
+
+            const response = await request(server)
+                  .post('/api/auth/confirm-account')
+                  .send({ token });
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual('Cuenta confirmada correctamente');
+            expect(response.status).not.toBe(401);
+      });
+
 });
 
