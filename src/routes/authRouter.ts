@@ -23,7 +23,6 @@ router.post('/create-account',
 router.post('/confirm-account',
       limiter,
       body('token')
-            .notEmpty()
             .isLength({ min: 6, max: 6 })
             .withMessage('Token no válido'),
       handleInputErrors,

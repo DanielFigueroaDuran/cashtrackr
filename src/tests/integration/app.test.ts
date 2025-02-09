@@ -105,3 +105,17 @@ describe('Authentication - Create Account', () => {
       });
 });
 
+describe('Authentication - Account Confirmation with Token or not vadid', () => {
+      it('should display error if token is empty', async () => {
+            const response = await request(server)
+                  .post('/api/auth/confirm-account').send({
+                        token: "not_valid"
+                  });
+
+            expect(response.status).toBe(400);
+            expect(response.body).toHaveProperty('errors');
+            expect(response.body.errors).toHaveLength(1);
+            expect(response.body.errors[0].msg).toBe('Token no válido')
+      });
+});
+

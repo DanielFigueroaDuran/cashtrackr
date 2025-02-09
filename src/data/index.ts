@@ -6,7 +6,7 @@ const clearData = async () => {
       try {
             //delete database correctly
             await db.sync({ force: true });
-            console.log('Datos eliminados correctamente');
+            //console.log('Datos eliminados correctamente');
             exit(0);
       } catch (error) {
             // console.log(error);
