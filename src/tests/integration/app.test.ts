@@ -4,6 +4,7 @@ import { AuthController } from "../../controllers/AuthController";
 import { response } from "express";
 import { body } from 'express-validator';
 import Response from 'express';
+import UserModel from "../../models/UserModel";
 
 describe('Authentication - Create Account', () => {
 
@@ -186,15 +187,41 @@ describe('Authentication - Login', () => {
                   .post('/api/auth/login')
                   .send({
                         password: "12345678",
-                        email: "user@test.com"
+                        email: "user_not_found@test.com"
                   });
 
 
             expect(response.status).toBe(404);
             expect(response.body).toHaveProperty('error');
-            expect(response.body.error.msg).toBe('Usuario no Encontrado');
+            expect(response.body.error).toBe('Usuario no Encontrado');
 
             expect(response.status).not.toBe(200);
+
+      });
+
+      it('should return a 403 error if the user account is not confirmed', async () => {
+
+            (jest.spyOn(UserModel, 'findOne') as jest.Mock).mockResolvedValue({
+                  id: 1,
+                  confirmed: false,
+                  password: "hashedPassword",
+                  email: "user_not_confirmed@test.com"
+            });
+
+            const response = await request(server)
+                  .post('/api/auth/login')
+                  .send({
+                        password: "12345678",
+                        email: "user_not_confirmed@test.com"
+                  });
+
+
+            expect(response.status).toBe(403);
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toBe('La cuenta no ha sido confirmada');
+
+            expect(response.status).not.toBe(200);
+            expect(response.status).not.toBe(404);
 
       });
 });
