@@ -89,9 +89,9 @@ describe('Authentication - Create Account', () => {
       it('should return 409 conflict when a user is already registered ', async () => {
 
             const userData = {
-                  "name": "Daniel",
-                  "password": "12345678",
-                  "email": "test@test.com"
+                  name: "Daniel",
+                  password: "12345678",
+                  email: "test@test.com"
             };
 
             const response = await request(server)
@@ -167,8 +167,8 @@ describe('Authentication - Login', () => {
             const response = await request(server)
                   .post('/api/auth/login')
                   .send({
-                        password: "12345678",
-                        email: "no_valid"
+                        "password": "12345678",
+                        "email": "no_valid"
                   });
 
             const loginMock = jest.spyOn(AuthController, 'login');
@@ -186,8 +186,8 @@ describe('Authentication - Login', () => {
             const response = await request(server)
                   .post('/api/auth/login')
                   .send({
-                        password: "12345678",
-                        email: "user_not_found@test.com"
+                        "password": "12345678",
+                        "email": "user_not_found@test.com"
                   });
 
 
@@ -211,8 +211,37 @@ describe('Authentication - Login', () => {
             const response = await request(server)
                   .post('/api/auth/login')
                   .send({
-                        password: "12345678",
-                        email: "user_not_confirmed@test.com"
+                        "password": "12345678",
+                        "email": "user_not_confirmed@test.com"
+                  });
+
+
+            expect(response.status).toBe(403);
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toBe('La cuenta no ha sido confirmada');
+
+            expect(response.status).not.toBe(200);
+            expect(response.status).not.toBe(404);
+
+      });
+
+      it('should return a 403 error if the user account is not confirmed', async () => {
+
+            const userData = {
+                  name: "Test",
+                  password: "12345678",
+                  email: "user_not_confirmed@test.com"
+            };
+
+            await request(server)
+                  .post('/api/auth/create-account')
+                  .send(userData);
+
+            const response = await request(server)
+                  .post('/api/auth/login')
+                  .send({
+                        "password": userData.password,
+                        "email": userData.email
                   });
 
 
