@@ -5,6 +5,7 @@ import { response } from "express";
 import { body } from 'express-validator';
 import Response from 'express';
 import UserModel from "../../models/UserModel";
+import * as authUtils from "../../utils/auth";
 
 describe('Authentication - Create Account', () => {
 
@@ -250,6 +251,34 @@ describe('Authentication - Login', () => {
             expect(response.body.error).toBe('La cuenta no ha sido confirmada');
 
             expect(response.status).not.toBe(200);
+            expect(response.status).not.toBe(404);
+
+      });
+
+      it('should return a 401 error if the password is incorrect', async () => {
+
+            (jest.spyOn(UserModel, 'findOne') as jest.Mock).mockResolvedValue({
+                  id: 1,
+                  confirmed: true,
+                  password: "hashedPassword"
+            });
+
+            jest.spyOn(authUtils, 'checkPassword').mockResolvedValue(false);
+
+            const response = await request(server)
+                  .post('/api/auth/login')
+                  .send({
+                        "password": "wrongPassword",
+                        "email": "test@test.com"
+                  });
+
+
+            expect(response.status).toBe(401);
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toBe('password Incorrecto');
+
+            expect(response.status).not.toBe(200);
+            expect(response.status).not.toBe(404);
             expect(response.status).not.toBe(404);
 
       });
