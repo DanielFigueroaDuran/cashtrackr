@@ -6,6 +6,7 @@ import { body } from 'express-validator';
 import Response from 'express';
 import UserModel from "../../models/UserModel";
 import * as authUtils from "../../utils/auth";
+import { hasAccess } from "../../middleware/budget";
 
 describe('Authentication - Create Account', () => {
 
@@ -150,6 +151,11 @@ describe('Authentication - Account Confirmation with Token or not vadid', () => 
 });
 
 describe('Authentication - Login', () => {
+
+      beforeEach(() => {
+            jest.clearAllMocks(); //clears the previous mocks and the counter starts again
+      });
+
       it('should display validation errors when the form is empty', async () => {
             const response = await request(server)
                   .post('/api/auth/login')
@@ -257,13 +263,13 @@ describe('Authentication - Login', () => {
 
       it('should return a 401 error if the password is incorrect', async () => {
 
-            (jest.spyOn(UserModel, 'findOne') as jest.Mock).mockResolvedValue({
+            const findOne = (jest.spyOn(UserModel, 'findOne') as jest.Mock).mockResolvedValue({
                   id: 1,
                   confirmed: true,
                   password: "hashedPassword"
             });
 
-            jest.spyOn(authUtils, 'checkPassword').mockResolvedValue(false);
+            const checkPassword = jest.spyOn(authUtils, 'checkPassword').mockResolvedValue(false);
 
             const response = await request(server)
                   .post('/api/auth/login')
@@ -281,5 +287,7 @@ describe('Authentication - Login', () => {
             expect(response.status).not.toBe(404);
             expect(response.status).not.toBe(404);
 
+            expect(findOne).toHaveBeenCalledTimes(1);
+            expect(checkPassword).toHaveBeenCalledTimes(1);
       });
 });
