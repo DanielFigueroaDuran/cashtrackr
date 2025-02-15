@@ -326,3 +326,14 @@ describe('Authentication - Login', () => {
 
       });
 });
+
+describe('GET /api/budgets', () => {
+
+      it('shuold reject unauthenticatd to budgets without a jwt', async () => {
+            const response = await request(server)
+                  .get('/api/budgets');
+
+            expect(response.statusCode).toBe(401);
+            expect(response.body.error).toBe('No Autorizado');
+      });
+});
