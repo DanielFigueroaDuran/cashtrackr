@@ -7,6 +7,7 @@ import Response from 'express';
 import UserModel from "../../models/UserModel";
 import * as authUtils from "../../utils/auth";
 import { hasAccess } from "../../middleware/budget";
+import * as jwtUtils from "../../utils/jwt";
 
 describe('Authentication - Create Account', () => {
 
@@ -289,5 +290,39 @@ describe('Authentication - Login', () => {
 
             expect(findOne).toHaveBeenCalledTimes(1);
             expect(checkPassword).toHaveBeenCalledTimes(1);
+      });
+
+      it('should return a 401 error if the password is incorrect', async () => {
+
+            const findOne = (jest.spyOn(UserModel, 'findOne') as jest.Mock).mockResolvedValue({
+                  id: 1,
+                  confirmed: true,
+                  password: "hashedPassword"
+            });
+
+            const checkPassword = jest.spyOn(authUtils, 'checkPassword').mockResolvedValue(true);
+            const generateJWT = jest.spyOn(jwtUtils, 'generateJWT').mockReturnValue('jwt_token');
+
+            const response = await request(server)
+                  .post('/api/auth/login')
+                  .send({
+                        "password": "correctPassword",
+                        "email": "test@test.com"
+                  });
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual('jwt_token');
+
+            expect(findOne).toHaveBeenCalled();
+            expect(findOne).toHaveBeenCalledTimes(1);
+
+            expect(checkPassword).toHaveBeenCalled();
+            expect(checkPassword).toHaveBeenCalledTimes(1);
+            expect(checkPassword).toHaveBeenCalledWith('correctPassword', 'hashedPassword');
+
+            expect(generateJWT).toHaveBeenCalled();
+            expect(generateJWT).toHaveBeenCalledTimes(1);
+            expect(generateJWT).toHaveBeenCalledWith(1);
+
       });
 });
