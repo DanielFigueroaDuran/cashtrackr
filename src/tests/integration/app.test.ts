@@ -442,4 +442,15 @@ describe('GET /api/budgets/:id', () => {
             expect(response.status).not.toBe(400);
             expect(response.status).not.toBe(401);
       });
+
+      it('shuold return a single budget by id', async () => {
+            const response = await request(server)
+                  .post('/api/budgets/1')
+                  .auth(jwt, { type: 'bearer' });
+
+            expect(response.status).toBe(200);
+            expect(response.status).not.toBe(400);
+            expect(response.status).not.toBe(401);
+            expect(response.status).not.toBe(404);
+      });
 });
