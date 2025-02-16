@@ -404,3 +404,17 @@ describe('POST /api/budgets', () => {
             expect(response.body.errors).toHaveLength(4);
       });
 });
+
+describe('GET /api/budgets/:id', () => {
+      beforeAll(async () => {
+            await authenyicateUser();
+      });
+
+      it('shuold reject unauthenticated get to budget id without a jwt', async () => {
+            const response = await request(server)
+                  .post('/api/budgets/1');
+
+            expect(response.statusCode).toBe(401);
+            expect(response.body.error).toBe('No Autorizado');
+      });
+});
