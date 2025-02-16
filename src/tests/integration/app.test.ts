@@ -2,8 +2,6 @@ import request from "supertest";
 import server, { connectDB } from "../../server";
 import { AuthController } from "../../controllers/AuthController";
 import { response } from "express";
-import { body } from 'express-validator';
-import Response from 'express';
 import UserModel from "../../models/UserModel";
 import * as authUtils from "../../utils/auth";
 import { hasAccess } from "../../middleware/budget";
@@ -292,7 +290,7 @@ describe('Authentication - Login', () => {
             expect(checkPassword).toHaveBeenCalledTimes(1);
       });
 
-      it('should return a 401 error if the password is incorrect', async () => {
+      it('should return a jwt', async () => {
 
             const findOne = (jest.spyOn(UserModel, 'findOne') as jest.Mock).mockResolvedValue({
                   id: 1,
@@ -328,6 +326,26 @@ describe('Authentication - Login', () => {
 });
 
 describe('GET /api/budgets', () => {
+
+      let jwt: string
+
+      beforeAll(() => {
+            jest.restoreAllMocks() // restore jest.spy functions to your implementation
+      });
+
+      beforeAll(async () => {
+            const response = await request(server)
+                  .post('/api/auth/login')
+                  .send({
+                        email: "test@test.com",
+                        password: "12345678"
+                  });
+
+            jwt = response.body;
+            expect(response.status).toBe(200);
+
+            // console.log(response.body);
+      });
 
       it('shuold reject unauthenticatd to budgets without a jwt', async () => {
             const response = await request(server)
