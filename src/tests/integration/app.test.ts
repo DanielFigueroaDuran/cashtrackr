@@ -325,29 +325,32 @@ describe('Authentication - Login', () => {
       });
 });
 
+let jwt: string;
+
+const authenyicateUser = async () => {
+      const response = await request(server)
+            .post('/api/auth/login')
+            .send({
+                  email: "test@test.com",
+                  password: "12345678"
+            });
+
+      jwt = response.body;
+      expect(response.status).toBe(200);
+};
+
 describe('GET /api/budgets', () => {
 
-      let jwt: string
 
       beforeAll(() => {
             jest.restoreAllMocks() // restore jest.spy functions to your implementation
       });
 
       beforeAll(async () => {
-            const response = await request(server)
-                  .post('/api/auth/login')
-                  .send({
-                        email: "test@test.com",
-                        password: "12345678"
-                  });
-
-            jwt = response.body;
-            expect(response.status).toBe(200);
-
-            // console.log(response.body);
+            await authenyicateUser();
       });
 
-      it('shuold reject unauthenticatd to budgets without a jwt', async () => {
+      it('shuold reject unauthenticated to budgets without a jwt', async () => {
             const response = await request(server)
                   .get('/api/budgets');
 
@@ -355,7 +358,16 @@ describe('GET /api/budgets', () => {
             expect(response.body.error).toBe('No Autorizado');
       });
 
-      it('shuold reject unauthenticatd to budgets without a jwt', async () => {
+      it('shuold reject unauthenticatd access to budgets without a valid jwt', async () => {
+            const response = await request(server)
+                  .get('/api/budgets')
+                  .auth('no_valid', { type: 'bearer' });
+
+            expect(response.statusCode).toBe(500);
+            expect(response.body.error).toBe('Token no Válido');
+      });
+
+      it('shuold allow authenticatd access to budgets with a valid jwt', async () => {
             const response = await request(server)
                   .get('/api/budgets')
                   .auth(jwt, { type: 'bearer' });
@@ -363,5 +375,20 @@ describe('GET /api/budgets', () => {
             expect(response.body).toHaveLength(0);
             expect(response.statusCode).not.toBe(401);
             expect(response.body.error).not.toBe('No Autorizado');
+      });
+});
+
+describe('POST /api/budgets', () => {
+
+      beforeAll(async () => {
+            await authenyicateUser();
+      });
+
+      it('shuold reject unauthenticated post to budgets without a jwt', async () => {
+            const response = await request(server)
+                  .post('/api/budgets');
+
+            expect(response.statusCode).toBe(401);
+            expect(response.body.error).toBe('No Autorizado');
       });
 });
