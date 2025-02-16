@@ -354,4 +354,14 @@ describe('GET /api/budgets', () => {
             expect(response.statusCode).toBe(401);
             expect(response.body.error).toBe('No Autorizado');
       });
+
+      it('shuold reject unauthenticatd to budgets without a jwt', async () => {
+            const response = await request(server)
+                  .get('/api/budgets')
+                  .auth(jwt, { type: 'bearer' });
+
+            expect(response.body).toHaveLength(0);
+            expect(response.statusCode).not.toBe(401);
+            expect(response.body.error).not.toBe('No Autorizado');
+      });
 });
