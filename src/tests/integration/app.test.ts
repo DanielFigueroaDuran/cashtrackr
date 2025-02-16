@@ -363,7 +363,7 @@ describe('GET /api/budgets', () => {
                   .get('/api/budgets')
                   .auth('no_valid', { type: 'bearer' });
 
-            expect(response.statusCode).toBe(500);
+            expect(response.status).toBe(500);
             expect(response.body.error).toBe('Token no Válido');
       });
 
@@ -373,7 +373,7 @@ describe('GET /api/budgets', () => {
                   .auth(jwt, { type: 'bearer' });
 
             expect(response.body).toHaveLength(0);
-            expect(response.statusCode).not.toBe(401);
+            expect(response.status).not.toBe(401);
             expect(response.body.error).not.toBe('No Autorizado');
       });
 });
@@ -384,11 +384,11 @@ describe('POST /api/budgets', () => {
             await authenyicateUser();
       });
 
-      it('shuold reject unauthenticated post to budgets without a jwt', async () => {
+      it('shuold reject unauthenticated post request to budgets without a jwt', async () => {
             const response = await request(server)
                   .post('/api/budgets');
 
-            expect(response.statusCode).toBe(401);
+            expect(response.status).toBe(401);
             expect(response.body.error).toBe('No Autorizado');
       });
 
@@ -400,7 +400,7 @@ describe('POST /api/budgets', () => {
 
                   });
 
-            expect(response.statusCode).toBe(400);
+            expect(response.status).toBe(400);
             expect(response.body.errors).toHaveLength(4);
       });
 });
@@ -410,11 +410,36 @@ describe('GET /api/budgets/:id', () => {
             await authenyicateUser();
       });
 
-      it('shuold reject unauthenticated get to budget id without a jwt', async () => {
+      it('shuold reject unauthenticated get to request to budget id without a jwt', async () => {
             const response = await request(server)
                   .post('/api/budgets/1');
 
-            expect(response.statusCode).toBe(401);
+            expect(response.status).toBe(401);
             expect(response.body.error).toBe('No Autorizado');
+      });
+
+
+      //       it('shuold return 400 bad request when id is not valid', async () => {
+      //             const response = await request(server)
+      //                   .post('/api/budgets/not_valid')
+      //                   .auth(jwt, { type: 'bearer' });
+
+      //             expect(response.status).toBe(400);
+      //             expect(response.body.errors).toBeTruthy();
+      //             expect(response.body.errors).toHaveLength(1);
+      //             expect(response.body.errors[0].msg).toBe('ID no válido');
+      //             expect(response.status).not.toBe(401);
+      //             expect(response.body.error).not.toBe('No Autorizado');
+      //       });
+
+      it('shuold return 404 not found when a budget doesnt exists', async () => {
+            const response = await request(server)
+                  .post('/api/budgets/3000')
+                  .auth(jwt, { type: 'bearer' });
+
+            expect(response.status).toBe(404);
+            expect(response.body.error).not.toBe('Presupuesto no encontrado');
+            expect(response.status).not.toBe(400);
+            expect(response.status).not.toBe(401);
       });
 });
