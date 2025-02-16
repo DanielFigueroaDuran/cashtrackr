@@ -391,4 +391,16 @@ describe('POST /api/budgets', () => {
             expect(response.statusCode).toBe(401);
             expect(response.body.error).toBe('No Autorizado');
       });
+
+      it('shuold display validation when the form is submited with invalid data', async () => {
+            const response = await request(server)
+                  .post('/api/budgets')
+                  .auth(jwt, { type: 'bearer' })
+                  .send({
+
+                  });
+
+            expect(response.statusCode).toBe(400);
+            expect(response.body.errors).toHaveLength(4);
+      });
 });
