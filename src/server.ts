@@ -31,7 +31,7 @@ app.use('/api/auth', authRouter);
 //       res.send('Todo bien...');
 // });
 
-console.log(process.env.NODE_ENV);
+//console.log(process.env.NODE_ENV);
 
 
 export default app
