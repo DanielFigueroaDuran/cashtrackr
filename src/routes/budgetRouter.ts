@@ -4,7 +4,7 @@ import { body, param } from "express-validator";
 import { handleInputErrors } from '../middleware/validation';
 import { hasAccess, validateBudgetExist, validateBudgetId, validateBudgetInput } from '../middleware/budget';
 import { ExpensesController } from "../controllers/ExpenseController";
-import { validateExpenseExist, validateExpenseId, validateExpenseInput } from "../middleware/expense";
+import { belongsToBudget, validateExpenseExist, validateExpenseId, validateExpenseInput } from "../middleware/expense";
 import { authenticate } from "../middleware/auth";
 
 const router = Router();
@@ -19,6 +19,7 @@ router.param('budgetId', hasAccess);
 
 router.param('expenseId', validateExpenseId);
 router.param('expenseId', validateExpenseExist);
+router.param('expenseId', belongsToBudget);
 
 router.get('/', BudgetController.getAll);
 
