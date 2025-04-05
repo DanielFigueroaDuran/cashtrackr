@@ -73,6 +73,11 @@ router.get('/user',
       AuthController.user
 );
 
+router.put('/user',
+      authenticate,
+      AuthController.updateUser
+);
+
 router.post('/update-password',
       authenticate,
       body('current_password')
@@ -86,7 +91,7 @@ router.post('/update-password',
 router.post('/check-password',
       authenticate,
       body('password')
-            .notEmpty().withMessage('El password actual no puede ir vácio'),
+            .notEmpty().withMessage('El password actual no puede ir vacío'),
       handleInputErrors,
       AuthController.checkPassword
 );

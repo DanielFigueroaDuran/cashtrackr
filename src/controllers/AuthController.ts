@@ -205,4 +205,12 @@ export class AuthController {
             res.json('Passwor Correcto');
 
       };
+
+      static updateUser = async (req: Request, res: Response) => {
+            // res.json(' Desde Update User');
+            const { name, email } = req.body;
+            //res.json(req.body);
+            res.json(req.user.id);
+
+      };
 };

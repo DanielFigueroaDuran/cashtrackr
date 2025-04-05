@@ -27,10 +27,6 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
             return;
       };
 
-      // res.json({
-      //       token
-      // });
-
       try {
             const decored = Jwt.verify(token, process.env.JWT_SECRET);
             // res.json(decored);
