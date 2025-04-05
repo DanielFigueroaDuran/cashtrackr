@@ -5,7 +5,6 @@ import { generateToken } from '../utils/token';
 import { AuthEmail } from '../email/AuthEmail';
 import { generateJWT } from '../utils/jwt';
 
-
 export class AuthController {
       static createAccount = async (req: Request, res: Response) => {
             const { email, password } = req.body;
@@ -210,7 +209,26 @@ export class AuthController {
             // res.json(' Desde Update User');
             const { name, email } = req.body;
             //res.json(req.body);
-            res.json(req.user.id);
+            //res.json(req.user.id);
+
+            try {
+                  const existingUser = await UserModel.findOne({ where: { email } })
+                  //console.log(existingcUser);
+                  if (existingUser && existingUser.id !== req.user.id) {
+                        // console.log(existingUser.id);
+                        // console.log(req.user.id);
+
+                        const error = new Error('Ese email ya está registrado por otro usuario');
+                        res.status(409).json({ error: error.message });
+                        return
+                  };
+                  await UserModel.update({ email, name }, {
+                        where: { id: req.user.id }
+                  });
+                  res.json('Perfir actualizado correctamente');
+            } catch (error) {
+                  res.status(500).json('Hubo un error');
+            };
 
       };
 };
